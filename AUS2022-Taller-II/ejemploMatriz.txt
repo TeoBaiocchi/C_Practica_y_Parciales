@@ -1,0 +1,4 @@
+int *matriz;
+    int dimension = 5;
+    matriz = (int) malloc(sizeof(int) * dimension); //reservas el espacio
+    *(matriz) 1;
