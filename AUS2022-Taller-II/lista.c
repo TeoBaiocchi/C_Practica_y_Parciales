@@ -15,7 +15,7 @@ void mostrar(legislador*);
 int miembro(char*, legislador**, legislador**);
 
 
-//Funciones extra de utilidades
+//Funciones extra, utilidades y menues
 void limpiarPantalla();
 void bufferEnter();
 void separador();
@@ -26,10 +26,11 @@ void blanco();
 void negro();
 void colorReset();
 void header();
-void headerComanda();
 void busqueda(legislador*, legislador*);
 void menuPrincipal(legislador*, legislador*);
-void comandaIngreso(legislador*, legislador*);
+void comandaEliminar(legislador*, legislador*);
+void ingresoBueno(legislador*, legislador*);
+void ingresoMalo(legislador*, legislador*);
 
 
 int main(){
@@ -37,6 +38,7 @@ int main(){
     legislador* chicos_malos;
     chicos_malos = NULL;
     chicos_buenos = NULL;
+
     //Algunos valores por defecto...
     inserta(BUENO, "arthur", &chicos_buenos);
     inserta(BUENO, "hosea", &chicos_buenos);
@@ -45,8 +47,6 @@ int main(){
     inserta(BUENO, "lenny", &chicos_buenos);
     inserta(BUENO, "sadie", &chicos_buenos);
     inserta(MALO, "micah", &chicos_malos);
-
-    
 
     menuPrincipal(chicos_buenos, chicos_malos);
     return 0;
@@ -78,13 +78,13 @@ void menuPrincipal(legislador * chicos_buenos, legislador * chicos_malos){
                 limpiarPantalla();
                 //comandaIngreso(chicos_buenos, chicos_malos);
             break;
-            
-            case 5:
-                limpiarPantalla();
-                ingersoMalo(chicos_buenos, chicos_malos);
-            break;
-            
+
             case 3:
+                limpiarPantalla();
+                ingresoMalo(chicos_buenos, chicos_malos);
+            break;
+
+            case 4:
                 limpiarPantalla();
                 comandaEliminar(chicos_buenos, chicos_malos);
             break;
@@ -104,7 +104,7 @@ void menuPrincipal(legislador * chicos_buenos, legislador * chicos_malos){
             case 6:
                 salir = 1;
             break;
-            
+
 
 
             default:
@@ -113,7 +113,39 @@ void menuPrincipal(legislador * chicos_buenos, legislador * chicos_malos){
     }
 }
 
-void comandaEliminar(legislador ** chicos_buenos, legislador ** chicos_malos){
+void ingresoMalo(legislador * chicos_buenos, legislador * chicos_malos){
+    header();
+    printf("Ingrese el nombre del legislador de voto desfavorable: ");
+    char aux[50];
+    scanf("%[^\n]", aux);
+    bufferEnter();
+    int encontrado;
+    encontrado = miembro(aux, &chicos_buenos, &chicos_malos);
+    printf("\n %i \n", encontrado);
+    switch(encontrado){
+        case BUENO:
+            suprime(BUENO, aux, &chicos_buenos);
+            inserta(MALO, aux, &chicos_malos);
+        break;
+
+        case MALO:
+            printf("Ya esta ingresado en sistema. No se efectuo cambio.\n");
+        break;
+
+        case -1:
+            inserta(MALO, aux, &MALO);
+        break;
+
+        default:
+            printf("Algo salio mal...\n");
+        break;
+    }
+    printf("Presione Enter para continuar.");
+    bufferEnter();
+
+}
+
+void comandaEliminar(legislador* chicos_buenos, legislador* chicos_malos){
         header();
         printf("Ingrese el nombre del legislador a eliminar: ");
         char aux[50];
@@ -127,10 +159,10 @@ void comandaEliminar(legislador ** chicos_buenos, legislador ** chicos_malos){
             bufferEnter();
             if(i == 1){
                 if(encontrado == BUENO){
-                suprime(BUENO, aux, &chicos_buenos);    
+                suprime(BUENO, aux, &chicos_buenos);
             } else {
-                suprime(MALO, aux, &chicos_malos);  
-                }       
+                suprime(MALO, aux, &chicos_malos);
+                }
             }
         } else {
             printf("No se encontro al legislador\nPresiona enter para continuar");
@@ -138,108 +170,7 @@ void comandaEliminar(legislador ** chicos_buenos, legislador ** chicos_malos){
         }
 }
 
-void mostrar(legislador* lista){
-    legislador * temp;
-    temp = lista;
-    if(temp == NULL){
-        printf("Fin de la lista\n");
-    }
-    while(temp != NULL){
-        printf("%s\n", temp->nombre);
-        temp = temp->siguiente;
-    }
-}
 
-
-
-void busqueda(legislador* chicos_buenos, legislador* chicos_malos){
-    char aux[50];
-    header();
-    printf("Ingrese el nombre del legislador a buscar: ");
-    scanf("%[^\n]", aux);
-    bufferEnter();
-    miembro(aux, &chicos_buenos, &chicos_malos);
-    printf("Presione enter para continuar.");
-    bufferEnter();
-}
-
-
-void comandaIngreso(legislador* chicos_buenos, legislador* chicos_malos){
-    //Funcion en desuso. No me anduvo y no supe por que y no quise perder mas tiempo
-    // Lo reemplace por dos entradas diferentes en el menu para ingresar buenos o malos que si funciona
-    // Pero no encuentro el motivo
-    int valido;
-    
-    while(1)
-    {
-        int i, valido = 0;
-        limpiarPantalla();
-        headerComanda();
-        char aux[50] = "", aux2[49] = "";
-        
-        printf("Ingrese el comando: ");
-        scanf("%[^\n]", aux);
-        bufferEnter();
-
-        for(i = 1; aux[i] != '\0'; i++){
-            aux2[i-1] = aux[i];
-        } 
-        aux2[i] = '\0';
-        
-        printf("\n DEBUG, -%s-, -%s- \n\n", aux, aux2);
-        
-        if(aux[0] == 'E' || aux[0] == 'e'){
-            printf("Se terminó el proceso de ingreso.\n");
-            printf("Presione enter para continuar.");
-            bufferEnter();
-            return;
-        }
-        
-        int encontrado = miembro(aux2, &chicos_buenos, &chicos_malos); //0 bueno, 1 malo, -1 no encontrado
-        
-        if(aux[0] == 'F' || aux[0] == 'f')
-        {
-            if(encontrado == MALO)
-            {
-                suprime(MALO, aux2, &chicos_malos);
-                inserta(BUENO, aux2, &chicos_buenos);
-                valido = 1;    
-            }
-            if(encontrado == -1)
-            {
-                inserta(BUENO, aux2, &chicos_buenos);
-                valido = 1;    
-            }
-        }
-
-        if(aux[0] == 'D' || aux[0] == 'd')
-        {
-            if(encontrado == BUENO)
-            {
-                suprime(BUENO, aux2, &chicos_buenos);
-                inserta(MALO, aux2, &chicos_malos);
-                valido = 1;    
-            }
-            if(encontrado == -1)
-            {
-                inserta(MALO, aux2, &chicos_malos);
-                valido = 1;    
-            }
-        }
-
-        if(strlen(aux)<2){
-            valido = 0;
-        }
-
-        if(valido == 0){
-            printf("El comando no fue introducido correctamente.\n");
-        }
-        
-        printf("Presione enter para continuar.");
-        bufferEnter();
-    }
-
-}
 
 void inserta(int tipo, char * nombre, legislador ** lista){
 
@@ -255,6 +186,19 @@ void inserta(int tipo, char * nombre, legislador ** lista){
     } else {
         rojo(); printf("malos. \n"); colorReset();
     }
+}
+
+
+
+void busqueda(legislador* chicos_buenos, legislador* chicos_malos){
+    char aux[50];
+    header();
+    printf("Ingrese el nombre del legislador a buscar: ");
+    scanf("%[^\n]", aux);
+    bufferEnter();
+    miembro(aux, &chicos_buenos, &chicos_malos);
+    printf("Presione enter para continuar.");
+    bufferEnter();
 }
 
 int miembro(char * nombreArg, legislador** chicos_buenos, legislador ** chicos_malos){
@@ -305,6 +249,20 @@ void suprime(int tipo, char * nombre, legislador ** lista){
     }
 }
 
+void mostrar(legislador* lista){
+    legislador * temp;
+    temp = lista;
+    if(temp == NULL){
+        printf("La lista esta vacia\n");
+    }
+    while(temp != NULL){
+        printf("%s\n", temp->nombre);
+        temp = temp->siguiente;
+    }
+}
+
+
+
 
 
 
@@ -316,21 +274,13 @@ void separador(){
 }
 
 void header(){
-    verde(); printf("--> Sociedad para la Prevención de Injusticias con el Atún <--\n");
+    verde(); printf("--> Sociedad para la Prevencion de Injusticias con el Atun <--\n");
     separador();
     amarillo(); printf("Base de Datos de Legisladores\n");
     separador();
     separador();
 }
 
-void headerComanda(){
-    verde(); printf("--> Base de Datos de Legisladores <--\n");
-    separador();
-    amarillo(); printf("Sociedad para la Prevención de Injusticias con el Atún\n");
-    separador();
-    negro(); printf("Recuerde seguir el formato ["); verde(); printf("F"); negro(); printf("/"); rojo(); printf("D"); negro(); printf("][Nombre], o 'E' para terminar\n");
-    separador();
-}
 
 void verde(){
     printf("\033[1;32m");
@@ -371,3 +321,92 @@ void bufferEnter(){
   int c;
   while ((c = getchar()) != '\n' && c != EOF){}
 }
+
+/*
+void comandaIngreso(legislador* chicos_buenos, legislador* chicos_malos){
+    //Funcion en desuso. No me anduvo y no supe por que y no quise perder mas tiempo
+    // Lo reemplace por dos entradas diferentes en el menu para ingresar buenos o malos que si funciona
+    // Pero no encuentro el motivo
+    int valido;
+
+    while(1)
+    {
+        int i, valido = 0;
+        limpiarPantalla();
+        headerComanda();
+        char aux[50] = "", aux2[49] = "";
+
+        printf("Ingrese el comando: ");
+        scanf("%[^\n]", aux);
+        bufferEnter();
+
+        for(i = 1; aux[i] != '\0'; i++){
+            aux2[i-1] = aux[i];
+        }
+        aux2[i] = '\0';
+
+        printf("\n DEBUG, -%s-, -%s- \n\n", aux, aux2);
+
+        if(aux[0] == 'E' || aux[0] == 'e'){
+            printf("Se terminó el proceso de ingreso.\n");
+            printf("Presione enter para continuar.");
+            bufferEnter();
+            return;
+        }
+
+        int encontrado = miembro(aux2, &chicos_buenos, &chicos_malos); //0 bueno, 1 malo, -1 no encontrado
+
+        if(aux[0] == 'F' || aux[0] == 'f')
+        {
+            if(encontrado == MALO)
+            {
+                suprime(MALO, aux2, &chicos_malos);
+                inserta(BUENO, aux2, &chicos_buenos);
+                valido = 1;
+            }
+            if(encontrado == -1)
+            {
+                inserta(BUENO, aux2, &chicos_buenos);
+                valido = 1;
+            }
+        }
+
+        if(aux[0] == 'D' || aux[0] == 'd')
+        {
+            if(encontrado == BUENO)
+            {
+                suprime(BUENO, aux2, &chicos_buenos);
+                inserta(MALO, aux2, &chicos_malos);
+                valido = 1;
+            }
+            if(encontrado == -1)
+            {
+                inserta(MALO, aux2, &chicos_malos);
+                valido = 1;
+            }
+        }
+
+        if(strlen(aux)<2){
+            valido = 0;
+        }
+
+        if(valido == 0){
+            printf("El comando no fue introducido correctamente.\n");
+        }
+
+        printf("Presione enter para continuar.");
+        bufferEnter();
+    }
+
+}
+
+void headerComanda(){
+    verde(); printf("--> Base de Datos de Legisladores <--\n");
+    separador();
+    amarillo(); printf("Sociedad para la Prevención de Injusticias con el Atún\n");
+    separador();
+    negro(); printf("Recuerde seguir el formato ["); verde(); printf("F"); negro(); printf("/"); rojo(); printf("D"); negro(); printf("][Nombre], o 'E' para terminar\n");
+    separador();
+}
+
+*/
