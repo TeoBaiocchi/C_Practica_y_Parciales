@@ -15,10 +15,10 @@ que dada una matriz, la cantidad de filas y columnas de la misma, construya
 otra matriz con una fila más y una columna más, completando los valores
 nuevos de la matríz con 0.*/
 
+//INCOMPLETO
+
 #include<stdio.h>
 #include<stdlib.h>
-
-
 
 typedef struct direccion{
     char *IP;
@@ -26,8 +26,8 @@ typedef struct direccion{
 } Direccion;
 
 void ejercicio1();
-void mostrarIP(Direccion * mostrar);
-char * obtenerIP(Direccion *extraer);
+
+char * obtenerRed(Direccion *extraer);
 
 int main(){
     printf("Ejercicio 1: \n");
@@ -40,22 +40,56 @@ int main(){
 
 void ejercicio1(){
     Direccion * defecto = (Direccion *) malloc(sizeof(Direccion));
-    defecto->IP = (char*) malloc(sizeof(char) * 17);
-    defecto->Mask =(char*) malloc(sizeof(char) * 13);
+    defecto->IP = (char*) malloc(sizeof(char) * 18);
+    defecto->Mask =(char*) malloc(sizeof(char) * 18);
 
     defecto->IP = "192.168.146.222";
-    defecto->Mask ="255.255.255.0";
+    defecto->Mask = "255.255.255.0";
 
-    printf("(metodo 1)");
-    mostrarIP(defecto);
-    char * IP = obtenerIP(defecto);
-    printf("(metodo 2)La direccion IP de la estructura es %s \n", IP);
+    char * red = obtenerRed(defecto);
+    printf("La direccion de la estructura es %s \n", red);
 }
 
-void mostrarIP(Direccion *mostrar){
-        printf("La direccion IP de la estructura es: %s \n", mostrar->IP);        
-}
+char * obtenerRed(Direccion *extraer){
+    char **segmentosIp;
+    segmentosIp = (char**) malloc(sizeof(char*) * 5);
+    int i;
+    for(i = 0; i < 4; i++){
+        *(segmentosIp+i) = (char*) malloc(sizeof(char) * 5);
+    }
+    int j = 0;
+    for(i = 0; *(extraer->IP+i) != '\0' ; i++){
+        if( *(extraer->IP +i) != '.'){
+            *(*(segmentosIp+j)+i) = *(extraer->IP+i);
+        } else {
+            j++;
+        }
+    }
 
-char * obtenerIP(Direccion *extraer){
-    return extraer->IP;
+    j=0;
+int    k=0;
+    char * devolver = (char*) malloc(sizeof(char) * 20);
+    for(i=0; *(extraer->Mask+i) != '\0'; i++){
+
+        if(*(extraer->Mask+i) != '\0'){
+            *(devolver+j) = *(*(segmentosIp+k));
+            j++;
+            *(devolver+j) = *(*(segmentosIp+k))+1;
+            j++;
+            *(devolver+j) = *(*(segmentosIp+k))+2;
+            j++;
+            k++;
+        } else{
+            i++;
+            *(devolver+j) = '.';
+            printf(" %c ", *(devolver+j));
+            j++;
+        }
+    }
+
+    return devolver;
 }
+/*typedef struct direccion{
+    char *IP;
+    char *Mask;
+} Direccion;*/
